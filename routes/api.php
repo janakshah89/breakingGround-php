@@ -17,3 +17,25 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get("/clientTestimonials","App\Http\Controllers\ClientTestimonialsController@listItems");
+
+Route::fallback(
+    function () {
+        return response()->json(
+            [
+                'file' => __FILE__,
+                'line' => __LINE__,
+                'code' => 404,
+                'message' => 'Not Found',
+                'trace' => null,
+                'response' => [
+                    __('errors.not_found'),
+                ],
+            ],
+            404,
+            [],
+            JSON_UNESCAPED_UNICODE
+        );
+    }
+)->name('Api.NotFound');
