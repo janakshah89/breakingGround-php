@@ -19,6 +19,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get("/clientTestimonials","App\Http\Controllers\ClientTestimonialsController@listItems");
+Route::get("/sitestatics","App\Http\Controllers\SiteStaticsController@listItems");
+Route::get("/sitestatics/{slug}","App\Http\Controllers\SiteStaticsController@getItems");
 
 Route::fallback(
     function () {
@@ -29,9 +31,7 @@ Route::fallback(
                 'code' => 404,
                 'message' => 'Not Found',
                 'trace' => null,
-                'response' => [
-                    __('errors.not_found'),
-                ],
+                'response' => [],
             ],
             404,
             [],
