@@ -15,7 +15,7 @@ class ClientTestimonialsController extends Controller
         try{
             $records =  ClientTestimonials::get();
             foreach ($records as $value){
-                $value->file = base_path()."/uploads/" . $value->file;
+                $value->file = config('constant.uploadPath') . $value->file;
             }
             return $this->successResponse($records,trans('auth.getRecords'));
         }catch(ModelNotFoundException $e){
