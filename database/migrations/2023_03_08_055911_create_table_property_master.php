@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->index();
             $table->unsignedBigInteger('user_id')->index();
+            $table->boolean('buyorlease')->default('0')->comment("1=Buy");
             $table->unsignedInteger('type');
             $table->unsignedInteger('availability');
             $table->unsignedInteger('location');
