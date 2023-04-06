@@ -21,31 +21,31 @@ class SiteStaticsSeeder extends Seeder
                 "name"=>"Industrial",
                 "slug"=>"property_type",
                 "description"=>"",
-                "sort_order"=>"",
+                "sort_order"=>"0",
             ],
             [
                 "name"=>"Warehouse",
                 "slug"=>"property_type",
                 "description"=>"",
-                "sort_order"=>"",
+                "sort_order"=>"1",
             ],
             [
                 "name"=>"Land",
                 "slug"=>"property_type",
                 "description"=>"",
-                "sort_order"=>"",
+                "sort_order"=>"2",
             ],
             [
                 "name"=>"Read/BrownField",
                 "slug"=>"availability",
                 "description"=>"",
-                "sort_order"=>"",
+                "sort_order"=>"3",
             ],
             [
                 "name"=>"BTS/GreenField",
                 "slug"=>"availability",
                 "description"=>"",
-                "sort_order"=>"",
+                "sort_order"=>"4",
             ]
         ];
         foreach ($data as $value){
