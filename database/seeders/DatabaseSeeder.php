@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(ClientTestmonialsSeeder::class);
         $this->call(PropertyDetailsFieldsSeeder::class);
+        $this->call(SiteStaticsSeeder::class);
     }
 }
