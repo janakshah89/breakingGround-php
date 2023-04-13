@@ -13,7 +13,7 @@ class PropertyMasterController extends Controller
     public function list()
     {
         $properties = PropertyMaster::with('location','buyorlease','types','availability','microMarket')
-            ->where('is_active',1)->paginate(2);
+            ->where('is_active',1)->paginate(6);
         return $this->successResponse($properties,trans('auth.getRecords'));
     }
     public function create()
