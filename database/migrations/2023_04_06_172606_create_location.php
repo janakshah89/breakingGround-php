@@ -13,12 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('property_fields', function (Blueprint $table) {
+        Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->string('category')->nullable();
-            $table->string('name');
-            $table->string('slug');
-            $table->boolean('is_active')->default(1)->comment('1=Yes');
+            $table->string("name");
+            $table->boolean("is_active")->default('1');
             $table->timestamps();
         });
     }
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('property_fields');
+        Schema::dropIfExists('locations');
     }
 };

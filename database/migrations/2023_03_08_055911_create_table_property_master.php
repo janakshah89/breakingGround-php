@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('property_master', function (Blueprint $table) {
+        Schema::create('property_masters', function (Blueprint $table) {
             $table->id();
             $table->string('name')->index();
             $table->unsignedBigInteger('user_id')->index();
@@ -37,6 +37,7 @@ return new class extends Migration
             $table->boolean('is_premium')->default(0)->comment("1=Yes");
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->boolean('is_active')->default(1)->comment('1=Yes');
         });
 
     }
@@ -48,6 +49,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('property_master');
+        Schema::dropIfExists('property_masters');
     }
 };
