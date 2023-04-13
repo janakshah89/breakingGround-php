@@ -40,7 +40,7 @@ class PropertyDetailsFieldsSeeder extends Seeder
             ["Dock Dimensions (H X W)","dock_dimensions","Plinth & Docks"],
             ["Dock Levellers","dock_levellers","Plinth & Docks"],
             ["Canopy","canopy","Roof & Wall Panels / Partitions"],
-            ["Canopy","roof_type","Roof & Wall Panels / Partitions"],
+            ["Roof Type","roof_type","Roof & Wall Panels / Partitions"],
             ["Roof Slope","roof_slope","Roof & Wall Panels / Partitions"],
             ["Insulation","insulation","Roof & Wall Panels / Partitions"],
             ["Puff Panels / Glasswool","puff_panels_glasswool","Roof & Wall Panels / Partitions"],
