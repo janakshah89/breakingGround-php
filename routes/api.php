@@ -23,7 +23,8 @@ Route::get("/sitestatics","App\Http\Controllers\SiteStaticsController@listItems"
 Route::get("/sitestatics/{slug}","App\Http\Controllers\SiteStaticsController@getItems");
 
 Route::get("/location","App\Http\Controllers\CommonController@listLocation");
-Route::get("/location_market","App\Http\Controllers\CommonController@listLocationMicroMarket");
+Route::get("/location_market", "App\Http\Controllers\CommonController@listLocationMicroMarket");
+Route::get("/location/{location}/market", "App\Http\Controllers\CommonController@listLocationMicroMarket");
 
 Route::get("/properties","App\Http\Controllers\PropertyMasterController@list");
 Route::post("properties","App\Http\Controllers\PropertyMasterController@create");

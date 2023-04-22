@@ -8,17 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 class PropertyMaster extends Model
 {
     use HasFactory;
+
     public $timestamps = true;
     protected $guarded = ['id', 'created_at', 'updated_at'];
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'is_active',
+    ];
 
     public function details()
     {
-        return $this->hasMany(PropertyDetails::class, 'property_id','id')->where('is_active',1)
-            ->select('id','property_id','field','value');
+        return $this->hasMany(PropertyDetails::class, 'property_id', 'id')
+            ->select('id', 'property_id', 'field', 'value');
     }
+
     public function files()
     {
-        return $this->hasMany(PropertyFiles::class, 'property_id','id')->where('is_active',1);
+        return $this->hasMany(PropertyFiles::class, 'property_id', 'id')
+            ->where('is_active', 1);
     }
     public function location()
     {

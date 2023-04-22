@@ -13,13 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('location_micro_markets', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger("location_id");
-            $table->string("name");
-            $table->text("description")->nullable();
-            $table->string("image")->nullable();
-            $table->boolean("is_active")->default('1');
+        Schema::create('auth_tokens', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
+            $table->text('auth_token');
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('location_micro_markets');
+        Schema::dropIfExists('auth_tokens');
     }
 };
