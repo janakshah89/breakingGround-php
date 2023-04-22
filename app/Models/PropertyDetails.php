@@ -13,7 +13,7 @@ class PropertyDetails extends Model
 
     public function fields()
     {
-        return $this->hasOne(PropertyFields::class, 'id','field')->select('id','name');
+        return $this->hasOne(PropertyFields::class, 'id', 'field')->select('id', 'name');
     }
 }
 
