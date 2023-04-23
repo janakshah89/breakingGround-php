@@ -10,9 +10,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use App\Models\OauthAccessToken;
+use Illuminate\Support\Facades\Hash;
 
 class CommonController extends Controller
 {
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
+
     public function listLocation(Request $request): JsonResponse
     {
         try {
@@ -46,22 +53,17 @@ class CommonController extends Controller
     {
         $input = $this->request->post();
         $rememberMe = false;
-
-
         if (Auth::attempt($input, $rememberMe)) {
-            OauthAccessToken::where('user_id', Auth::user()->id)->delete();
             $this->currentUser = Auth::user();
             // check account is active or deactivate
-            if ($this->currentUser['status'] != 1) {
+            if ($this->currentUser['is_active'] != 1) {
                 Session::flush();
-                $accLocked = trans('message.accountLocked');
-                return $this->sendAccessDenied($accLocked);
+                return $this->sendAccessDenied("Sorry the User is not active");
             }
-            $this->currentUser->token = $this->currentUser->createToken('WWL')->accessToken;
-            $this->currentUser->isLogin = true;
-            return $this->successResponse($this->currentUser, trans('message.loginSucc'));
+            $token = $this->currentUser->createToken('PIVOT', ['server:update']);
+            return $this->successResponse(['token' => $token->plainTextToken], "Login Success");
         } else {
-            return $this->sendBadRequest(trans('message.loginErr'));
+            return $this->sendBadRequest("Email or Password in wrong");
         }
     }
 }

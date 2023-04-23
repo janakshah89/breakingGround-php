@@ -27,7 +27,8 @@ Route::get("/location_market", "App\Http\Controllers\CommonController@listLocati
 Route::get("/location/{location}/market", "App\Http\Controllers\CommonController@listLocationMicroMarket");
 
 Route::get("/properties","App\Http\Controllers\PropertyMasterController@list");
-Route::post("properties","App\Http\Controllers\PropertyMasterController@create");
+Route::post("properties", "App\Http\Controllers\PropertyMasterController@create");
+Route::post("login", "App\Http\Controllers\CommonController@login");
 
 Route::fallback(
     function () {
