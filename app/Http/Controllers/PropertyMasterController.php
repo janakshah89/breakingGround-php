@@ -10,11 +10,31 @@ use Illuminate\Http\Request;
 
 class PropertyMasterController extends Controller
 {
-    public function list()
+    public function list(Request $request)
     {
-        $properties = PropertyMaster::with('location','buyorlease','types','availability','microMarket')
-            ->where('is_active',1)->paginate(6);
-        return $this->successResponse($properties,trans('auth.getRecords'));
+        $params = $request->all();
+        $properties = PropertyMaster::with('location', 'buyorlease', 'types', 'availability', 'microMarket');
+
+        if (!empty($params['borl'])) {
+            $properties = $properties->where("buyorlease", $params['borl']);
+        }
+        if (!empty($params['type'])) {
+            $properties = $properties->where("type", $params['type']);
+        }
+        if (!empty($params['availability'])) {
+            $properties = $properties->where("availability", $params['availability']);
+        }
+        if (!empty($params['location'])) {
+            $properties = $properties->where("location", $params['location']);
+        }
+        if (!empty($params['micromarket'])) {
+            $properties = $properties->where("micromarket", $params['micromarket']);
+        }
+        if (!empty($params['sizeMax']) && !empty($params['sizeMin'])) {
+            $properties = $properties->whereBetween("sqft", [$params['sizeMin'], $params['sizeMax']]);
+        }
+        $properties = $properties->where('is_active', 1)->paginate(6);
+        return $this->successResponse($properties, trans('auth.getRecords'));
     }
     public function create()
     {

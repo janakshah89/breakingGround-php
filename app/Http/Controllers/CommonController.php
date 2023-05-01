@@ -60,7 +60,7 @@ class CommonController extends Controller
                 Session::flush();
                 return $this->sendAccessDenied("Sorry the User is not active");
             }
-            $token = $this->currentUser->createToken('PIVOT', ['server:update']);
+            $token = $this->currentUser->createToken('PIVOT', ['*']);
             return $this->successResponse(['token' => $token->plainTextToken], "Login Success");
         } else {
             return $this->sendBadRequest("Email or Password in wrong");
