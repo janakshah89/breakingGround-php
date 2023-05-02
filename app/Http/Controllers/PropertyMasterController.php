@@ -13,7 +13,7 @@ class PropertyMasterController extends Controller
     public function list(Request $request)
     {
         $params = $request->all();
-        $properties = PropertyMaster::with('location', 'buyorlease', 'types', 'availability', 'microMarket');
+        $properties = PropertyMaster::with('location', 'types', 'availability', 'microMarket');
 
         if (!empty($params['borl'])) {
             $properties = $properties->where("buyorlease", $params['borl']);
@@ -33,7 +33,12 @@ class PropertyMasterController extends Controller
         if (!empty($params['sizeMax']) && !empty($params['sizeMin'])) {
             $properties = $properties->whereBetween("sqft", [$params['sizeMin'], $params['sizeMax']]);
         }
-        $properties = $properties->where('is_active', 1)->paginate(6);
+        $properties = $properties->where('is_active', 1);
+
+        if (!$properties->count()) {
+            return $this->recordNotFound();
+        }
+        $properties = $properties->paginate(6);
         return $this->successResponse($properties, trans('auth.getRecords'));
     }
     public function create()
@@ -70,12 +75,18 @@ class PropertyMasterController extends Controller
         $dataArray->save();
 
         $propertyDetails = PropertyDetails::where('property_id', 1)->get();
-        $propertyDetails->map(function($i) use ($dataArray) {
+        $propertyDetails->map(function ($i) use ($dataArray) {
             unset($i['id']);
             $i->property_id = $dataArray->id;
             return $i;
         });
         PropertyDetails::insert($propertyDetails->toArray());
-        return $this->successResponse($dataArray,trans('auth.insertRecords'));
+        return $this->successResponse($dataArray, trans('auth.insertRecords'));
+    }
+
+    public function show(Request $request, $id)
+    {
+        return PropertyMaster::with('details.fields', 'location', 'types', 'availability',
+            'microMarket')->whereId($id)->firstorfail();
     }
 }
