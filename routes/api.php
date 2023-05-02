@@ -26,7 +26,8 @@ Route::get("/location","App\Http\Controllers\CommonController@listLocation");
 Route::get("/location_market", "App\Http\Controllers\CommonController@listLocationMicroMarket");
 Route::get("/location/{location}/market", "App\Http\Controllers\CommonController@listLocationMicroMarket");
 
-Route::get("/properties","App\Http\Controllers\PropertyMasterController@list");
+Route::get("/properties", "App\Http\Controllers\PropertyMasterController@list");
+Route::get("/properties/{id}", "App\Http\Controllers\PropertyMasterController@show");
 Route::post("properties", "App\Http\Controllers\PropertyMasterController@create");
 Route::post("login", "App\Http\Controllers\CommonController@login");
 
