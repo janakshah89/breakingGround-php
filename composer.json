@@ -51,7 +51,7 @@
             "@php artisan key:generate --ansi"
         ],
         "test": [
-            "composer dump-autoload"
+            "composer update --no-scripts"
         ]
     },
     "extra": {
