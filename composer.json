@@ -51,7 +51,7 @@
             "@php artisan key:generate --ansi"
         ],
         "test": [
-            "composer require maatwebsite/excel"
+            "composer update"
         ]
     },
     "extra": {
