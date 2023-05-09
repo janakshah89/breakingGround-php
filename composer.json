@@ -9,7 +9,8 @@
         "guzzlehttp/guzzle": "~7.4.3",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.2",
-        "laravel/tinker": "^2.7"
+        "laravel/tinker": "^2.7",
+        "maatwebsite/excel": "^3.1.48"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -41,17 +42,13 @@
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan migrate",
             "@php artisan db:seed",
-            "@php artisan optimize",
-            "@test"
+            "@php artisan optimize"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ],
-        "test": [
-            "composer update"
         ]
     },
     "extra": {
