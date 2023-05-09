@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('file_type')->comment('image, video, pdf');
             $table->boolean('is_active')->default(1)->comment('1=Yes');
             $table->timestamps();
-            $table->foreign('property_id')->references('id')->on('property_master')->onDelete('cascade');
         });
     }
 
