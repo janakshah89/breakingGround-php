@@ -231,7 +231,7 @@ class PropertyMasterController extends Controller
                     PropertyFiles::updateOrCreate(['property_id' => $property_id, 'file' => $dValue['file']], $fields);
                 }
             }
-            z
+            
             $ret[$key] = ["name" => 'name', "status" => "success", 'value' => $property_id];
         }
         return $ret;
