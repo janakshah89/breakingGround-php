@@ -15,7 +15,8 @@ use Faker\Provider\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Console\Input\Input;
-use Excel;
+use Maatwebsite\Excel\Excel as ExcelExcel;
+use Maatwebsite\Excel\Facades\Excel;
 use File;
 
 class PropertyMasterController extends Controller
@@ -111,7 +112,7 @@ class PropertyMasterController extends Controller
                 }
                 $path = $request->file('post_file')->getRealPath();
                 $data = Excel::toArray(new PropertyImport(), $path);
-                //return $data;
+                return $data;
                 if (!empty($data[0])) {
                     $staticArray['propetyFields'] = PropertyFields::pluck('id', 'slug')->toArray();
                     $staticArray['siteStatic'] = SiteStatics::pluck('id', 'name')->toArray();
@@ -231,7 +232,7 @@ class PropertyMasterController extends Controller
                     PropertyFiles::updateOrCreate(['property_id' => $property_id, 'file' => $dValue['file']], $fields);
                 }
             }
-            
+
             $ret[$key] = ["name" => 'name', "status" => "success", 'value' => $property_id];
         }
         return $ret;
