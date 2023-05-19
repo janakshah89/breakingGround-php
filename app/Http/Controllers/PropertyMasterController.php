@@ -106,13 +106,14 @@ class PropertyMasterController extends Controller
         try {
             $parameters = $request->all();
             if ($request->hasFile('post_file')) {
+                dd($request->file('post_file')->getPathName());
                 $extension = $request->file('post_file')->getClientOriginalExtension();
                 if (!in_array($extension, array('xls', 'xlsx', 'csv'))) {
                     return $this->sendBadRequest("not a valid extension");
                 }
                 $path = $request->file('post_file')->getRealPath();
                 $data = Excel::toArray(new PropertyImport(), $path);
-                dd($request->file('post_file')->getPathName());
+
                 return $data;
                 if (!empty($data[0])) {
                     $staticArray['propetyFields'] = PropertyFields::pluck('id', 'slug')->toArray();
