@@ -3,13 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Imports\PropertyImport;
+use App\Models\LocationMicroMarkets;
+use App\Models\Locations;
 use App\Models\PropertyDetails;
+use App\Models\PropertyFields;
+use App\Models\PropertyFiles;
 use App\Models\PropertyMaster;
+use App\Models\SiteStatics;
 use Faker\Factory;
 use Faker\Provider\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Console\Input\Input;
 use Excel;
+use File;
 
 class PropertyMasterController extends Controller
 {
@@ -106,6 +113,10 @@ class PropertyMasterController extends Controller
                 $data = Excel::toArray(new PropertyImport(), $path);
                 //return $data;
                 if (!empty($data[0])) {
+                    $staticArray['propetyFields'] = PropertyFields::pluck('id', 'slug')->toArray();
+                    $staticArray['siteStatic'] = SiteStatics::pluck('id', 'name')->toArray();
+                    $staticArray['location'] = Locations::pluck('id', 'name')->toArray();
+                    $staticArray['microMarket'] = LocationMicroMarkets::pluck('id', 'name')->toArray();
                     $nA = [];
                     foreach ($data[0] as $fKey => $first) {
                         if ($fKey == 0) {
@@ -116,7 +127,7 @@ class PropertyMasterController extends Controller
                                 $ikey = $first[0];
                                 if ($key < 19) {
                                     $nA[$ikey]['property'][$data[0][0][$key]] = $value;
-                                } else {
+                                } elseif ($key < 71) {
                                     $nA[$ikey]['details'][$data[0][0][$key]] = $value;
                                 }
                             }
@@ -127,24 +138,102 @@ class PropertyMasterController extends Controller
                             }
                         }
                     }
-                    return $nA;
+                    //return $nA;
                     // ini_set('max_execution_time', 0);
                     // set_time_limit(0);
                     // ini_set('memory_limit', '-1');
                     // ignore_user_abort(true);
-                    //$process = $this->common->import_user_csv($data);
-
+                    $result = ["name" => $ikey, "status" => "failed"];
+                    $process = $this->import_property_csv($nA, $staticArray);
+                    return $this->successResponse($process, "Import process done");
                 }
-                // IMPORT SUCCESS
-
-                return $this->successResponse("invalid File");
+                return $this->sendBadRequest("invalid Data");
             }
-            return $this->successResponse("invalid File");
+            return $this->sendBadRequest("invalid File");
         } catch (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $ex) {
             return $this->notFoundRequest();
         } catch
         (\Exception $ex) {
             return $this->sendErrorResponse($ex);
         }
+    }
+
+    public function import_property_csv($data, $staticArray)
+    {
+        $ret = [];
+        foreach ($data as $key => $value) {
+            $record = PropertyMaster::where('name', $key)->first();
+            $property = $value['property'];
+            //return $property['type'];
+            if (array_key_exists($property['type'], $staticArray['siteStatic'])) {
+                $property['type'] = $staticArray['siteStatic'][$property['type']];
+            } else {
+                $ret[$key] = ["name" => $property['name'], "status" => "failed", 'value' => "Type is not valid"];
+                continue;
+            }
+            if (array_key_exists($property['availability'], $staticArray['siteStatic'])) {
+                $property['availability'] = $staticArray['siteStatic'][$property['availability']];
+            } else {
+                $ret[$key] = ["name" => $property['name'], "status" => "failed", 'value' => "Availablity is not valid"];
+                continue;
+            }
+            if (array_key_exists($property['location'], $staticArray['location'])) {
+                $property['location'] = $staticArray['location'][$property['location']];
+            } else {
+                $ret[$key] = ["name" => $property['name'], "status" => "failed", 'value' => "Location is not valid"];
+                continue;
+            }
+            if (array_key_exists($property['micromarket'], $staticArray['microMarket'])) {
+                $property['micromarket'] = $staticArray['microMarket'][$property['micromarket']];
+            } else {
+                $ret[$key] = ["name" => $property['name'], "status" => "failed", 'value' => "Micromarket is not valid"];
+                continue;
+            }
+            $property['user_id'] = 1;
+            $property_id = PropertyMaster::updateOrCreate(['id' => $record->id], $property)->id;
+            // echo "<pre>";
+            // print_r($value);
+            // die();
+            foreach ($value['details'] as $dKey => $dValue) {
+                $fields = [
+                    'field' => $staticArray['propetyFields'][$dKey],
+                    'value' => $dValue,
+                    'name' => $dKey,
+                    'property_id' => $property_id,
+                ];
+                PropertyDetails::updateOrCreate(
+                    ['property_id' => $property_id, 'field' => $staticArray['propetyFields'][$dKey]], $fields);
+            }
+            foreach ($value['files'] as $dKey => $dValue) {
+                if ($dValue['file_type'] == 'image' || $dValue['file_type'] == 'pdf') {
+                    $fpath = base_path() . '/public/uploads/parin/' . $dValue['file'];
+                    $tpath = base_path() . '/public/uploads/' . $property_id . "/";
+                    Log::info("FROM : " . $fpath);
+                    File::ensureDirectoryExists($tpath, 777);
+                    if (file_exists($fpath)) {
+                        Log::info("TO : " . $tpath);
+                        File::move($fpath, $tpath . $dValue['file']);
+                        $fields = [
+                            'property_id' => $property_id,
+                            'file' => $dValue['file'],
+                            'display_name' => $dValue['display_name'] ?? "",
+                            'file_type' => $dValue['file_type'],
+                        ];
+                        PropertyFiles::insert($fields);
+                    }
+                } else {
+                    $fields = [
+                        'property_id' => $property_id,
+                        'file' => $dValue['file'],
+                        'display_name' => $dValue['display_name'] ?? "",
+                        'file_type' => $dValue['file_type'],
+                    ];
+                    PropertyFiles::updateOrCreate(['property_id' => $property_id, 'file' => $dValue['file']], $fields);
+                }
+            }
+            z
+            $ret[$key] = ["name" => 'name', "status" => "success", 'value' => $property_id];
+        }
+        return $ret;
     }
 }

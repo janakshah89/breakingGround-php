@@ -2,5 +2,5 @@
 
 function getUploadPath(): string
 {
-    return base_path()."/uploads/";
+    return base_path() . "/uploads/";
 }

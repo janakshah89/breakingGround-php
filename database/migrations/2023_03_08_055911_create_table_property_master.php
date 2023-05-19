@@ -23,7 +23,7 @@ return new class extends Migration
             $table->unsignedInteger('location');
             $table->unsignedInteger('micromarket');
             $table->text('description')->nullable();
-            $table->double('sqft');
+            $table->string('sqft');
             $table->double('rate')->nullable()->comment('actual price before discount applied');
             $table->double('discount')->nullable();
             $table->double('price');
