@@ -19,17 +19,19 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get("/clientTestimonials","App\Http\Controllers\ClientTestimonialsController@listItems");
-Route::get("/sitestatics","App\Http\Controllers\SiteStaticsController@listItems");
-Route::get("/sitestatics/{slug}","App\Http\Controllers\SiteStaticsController@getItems");
+Route::get("/sitestatics", "App\Http\Controllers\SiteStaticsController@listItems");
+Route::get("/sitestatics/{slug}", "App\Http\Controllers\SiteStaticsController@getItems");
 
-Route::get("/location","App\Http\Controllers\CommonController@listLocation");
+Route::get("/location", "App\Http\Controllers\CommonController@listLocation");
 Route::get("/location_market", "App\Http\Controllers\CommonController@listLocationMicroMarket");
 Route::get("/location/{location}/market", "App\Http\Controllers\CommonController@listLocationMicroMarket");
+Route::post("login", "App\Http\Controllers\CommonController@login");
 
 Route::get("/properties", "App\Http\Controllers\PropertyMasterController@list");
 Route::get("/properties/{id}", "App\Http\Controllers\PropertyMasterController@show");
 Route::post("properties", "App\Http\Controllers\PropertyMasterController@create");
-Route::post("login", "App\Http\Controllers\CommonController@login");
+Route::post("upload", "App\Http\Controllers\PropertyMasterController@upload");
+
 
 Route::fallback(
     function () {
