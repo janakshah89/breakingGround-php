@@ -123,6 +123,9 @@ class PropertyMasterController extends Controller
                         }
                         foreach ($first as $key => $value) {
                             if (strtolower($first[71]) != 'yes') {
+                                if (empty($first[0])) {
+                                    continue;
+                                }
                                 $ikey = $first[0];
                                 if ($key < 19) {
                                     $nA[$ikey]['property'][$data[0][0][$key]] = $value;
@@ -130,7 +133,7 @@ class PropertyMasterController extends Controller
                                     $nA[$ikey]['details'][$data[0][0][$key]] = $value;
                                 }
                             }
-                            if (strtolower($first[71]) == 'yes') {
+                            if (strtolower($first[71]) == 'yes' && !empty($first[72]) && !empty($first[74])) {
                                 $nA[$ikey]['files'][$fKey][$data[0][0][72]] = $first[72];
                                 $nA[$ikey]['files'][$fKey][$data[0][0][73]] = $first[73];
                                 $nA[$ikey]['files'][$fKey][$data[0][0][74]] = $first[74];
@@ -144,7 +147,7 @@ class PropertyMasterController extends Controller
                     // ignore_user_abort(true);
                     $result = ["name" => $ikey, "status" => "failed"];
                     $process = $this->import_property_csv($nA, $staticArray);
-                    return $this->successResponse($process, "Import process done");
+                    return $this->successResponse($process, "Import process finished");
                 }
                 return $this->sendBadRequest("invalid Data");
             }
@@ -159,11 +162,9 @@ class PropertyMasterController extends Controller
 
     public function import_property_csv($data, $staticArray)
     {
-        $ret = [];
         foreach ($data as $key => $value) {
             $record = PropertyMaster::where('name', $key)->first();
             $property = $value['property'];
-            //return $property['type'];
             if (array_key_exists($property['type'], $staticArray['siteStatic'])) {
                 $property['type'] = $staticArray['siteStatic'][$property['type']];
             } else {
@@ -189,49 +190,60 @@ class PropertyMasterController extends Controller
                 continue;
             }
             $property['user_id'] = 1;
-            $property_id = PropertyMaster::updateOrCreate(['id' => $record->id], $property)->id;
-            // echo "<pre>";
-            // print_r($value);
-            // die();
+            if (empty($record->id)) {
+                $create = PropertyMaster::create($property);
+                $property_id = $create->id;
+            } else {
+                $property_id = $record->id;
+                $record->update($property);
+            }
+            Log::info("Master Id: " . $property_id);
+
+            $tpath = base_path() . '/public/uploads/' . $property_id . "/";
+            File::ensureDirectoryExists($tpath, 777);
+
             foreach ($value['details'] as $dKey => $dValue) {
+                if (($dKey == 'park_layout' || $dKey == 'building_layout' || $dKey == 'photographs') && !empty($dValue)) {
+                    $fpath = base_path() . '/public/uploads/parin/' . $dValue;
+                    if (file_exists($fpath)) {
+                        File::move($fpath, $tpath . $dValue);
+                    }
+                }
                 $fields = [
                     'field' => $staticArray['propetyFields'][$dKey],
                     'value' => $dValue,
-                    'name' => $dKey,
                     'property_id' => $property_id,
                 ];
                 PropertyDetails::updateOrCreate(
                     ['property_id' => $property_id, 'field' => $staticArray['propetyFields'][$dKey]], $fields);
             }
-            foreach ($value['files'] as $dKey => $dValue) {
-                if ($dValue['file_type'] == 'image' || $dValue['file_type'] == 'pdf') {
-                    $fpath = base_path() . '/public/uploads/parin/' . $dValue['file'];
-                    $tpath = base_path() . '/public/uploads/' . $property_id . "/";
-                    Log::info("FROM : " . $fpath);
-                    File::ensureDirectoryExists($tpath, 777);
+
+            foreach ($value['files'] as $fValue) {
+                Log::info($fValue);
+                if ($fValue['file_type'] == 'image' || $fValue['file_type'] == 'pdf') {
+                    $fpath = base_path() . '/public/uploads/parin/' . $fValue['file'];
                     if (file_exists($fpath)) {
-                        Log::info("TO : " . $tpath);
-                        File::move($fpath, $tpath . $dValue['file']);
+                        File::move($fpath, $tpath . $fValue['file']);
                         $fields = [
                             'property_id' => $property_id,
-                            'file' => $dValue['file'],
-                            'display_name' => $dValue['display_name'] ?? "",
-                            'file_type' => $dValue['file_type'],
+                            'file' => $fValue['file'],
+                            'display_name' => $fValue['display_name'] ?? "",
+                            'file_type' => $fValue['file_type'],
                         ];
-                        PropertyFiles::insert($fields);
+                        PropertyFiles::updateOrCreate(['property_id' => $property_id, 'file' => $fValue['file']],
+                            $fields);
                     }
                 } else {
                     $fields = [
                         'property_id' => $property_id,
-                        'file' => $dValue['file'],
-                        'display_name' => $dValue['display_name'] ?? "",
-                        'file_type' => $dValue['file_type'],
+                        'file' => $fValue['file'],
+                        'display_name' => $fValue['display_name'] ?? "",
+                        'file_type' => $fValue['file_type'],
                     ];
-                    PropertyFiles::updateOrCreate(['property_id' => $property_id, 'file' => $dValue['file']], $fields);
+                    PropertyFiles::updateOrCreate(['property_id' => $property_id, 'file' => $fValue['file']], $fields);
                 }
             }
-
-            $ret[$key] = ["name" => 'name', "status" => "success", 'value' => $property_id];
+            $ret[$key] = ["name" => $key, "status" => "success", 'value' => $property_id];
         }
         return $ret;
     }

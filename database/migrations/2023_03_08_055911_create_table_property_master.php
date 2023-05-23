@@ -36,7 +36,6 @@ return new class extends Migration
             $table->string('lan')->nullable();
             $table->boolean('is_premium')->default(0)->comment("1=Yes");
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->boolean('is_active')->default(1)->comment('1=Yes');
         });
 
