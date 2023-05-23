@@ -200,7 +200,7 @@ class PropertyMasterController extends Controller
             Log::info("Master Id: " . $property_id);
 
             $tpath = base_path() . '/public/uploads/' . $property_id . "/";
-            File::ensureDirectoryExists($tpath, 777);
+            File::ensureDirectoryExists($tpath, 0777, true, true);
 
             foreach ($value['details'] as $dKey => $dValue) {
                 if (($dKey == 'park_layout' || $dKey == 'building_layout' || $dKey == 'photographs') && !empty($dValue)) {
