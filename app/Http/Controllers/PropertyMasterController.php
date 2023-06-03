@@ -49,7 +49,8 @@ class PropertyMasterController extends Controller
         if (!$properties->count()) {
             return $this->recordNotFound();
         }
-        $properties = $properties->paginate(6);
+        $perPage = !empty($params['perPage']) ? $params['perPage'] : 6;
+        $properties = $properties->paginate($perPage);
         return $this->successResponse($properties, trans('auth.getRecords'));
     }
 
@@ -113,9 +114,16 @@ class PropertyMasterController extends Controller
                 $data = Excel::toArray(new PropertyImport(), $request->file('post_file'));
                 if (!empty($data[0])) {
                     $staticArray['propetyFields'] = PropertyFields::pluck('id', 'slug')->toArray();
+
                     $staticArray['siteStatic'] = SiteStatics::pluck('id', 'name')->toArray();
+                    $staticArray['siteStatic'] = array_change_key_case($staticArray['siteStatic'], CASE_LOWER);
+
                     $staticArray['location'] = Locations::pluck('id', 'name')->toArray();
+                    $staticArray['location'] = array_change_key_case($staticArray['location'], CASE_LOWER);
+
                     $staticArray['microMarket'] = LocationMicroMarkets::pluck('id', 'name')->toArray();
+                    $staticArray['microMarket'] = array_change_key_case($staticArray['microMarket'], CASE_LOWER);
+
                     $nA = [];
                     foreach ($data[0] as $fKey => $first) {
                         if ($fKey == 0) {
@@ -162,31 +170,60 @@ class PropertyMasterController extends Controller
 
     public function import_property_csv($data, $staticArray)
     {
+        // echo "<pre>";
+        // print_r($staticArray);
+        // die();
         foreach ($data as $key => $value) {
             $record = PropertyMaster::where('name', $key)->first();
             $property = $value['property'];
+            // echo "<pre>";
+            // print_r($property);
+            // die();
+            $property['buyorlease'] = ($property['buyorlease'] == "Lease") ? 1 : 0;
+
+            $property['availability'] = strtolower($property['availability']);
+            $property['location'] = strtolower($property['location']);
+            $property['micromarket'] = strtolower($property['micromarket']);
+            $property['type'] = strtolower($property['type']);
+
             if (array_key_exists($property['type'], $staticArray['siteStatic'])) {
                 $property['type'] = $staticArray['siteStatic'][$property['type']];
             } else {
-                $ret[$key] = ["name" => $property['name'], "status" => "failed", 'value' => "Type is not valid"];
+                $ret[$key] = [
+                    "name" => $property['name'],
+                    "status" => "failed",
+                    'value' => $property['type'] . " Type is not valid",
+                ];
                 continue;
             }
             if (array_key_exists($property['availability'], $staticArray['siteStatic'])) {
                 $property['availability'] = $staticArray['siteStatic'][$property['availability']];
             } else {
-                $ret[$key] = ["name" => $property['name'], "status" => "failed", 'value' => "Availablity is not valid"];
+                $ret[$key] = [
+                    "name" => $property['name'],
+                    "status" => "failed",
+                    'value' => $property['availability'] . " Availablity is not valid",
+                ];
                 continue;
             }
             if (array_key_exists($property['location'], $staticArray['location'])) {
                 $property['location'] = $staticArray['location'][$property['location']];
             } else {
-                $ret[$key] = ["name" => $property['name'], "status" => "failed", 'value' => "Location is not valid"];
+                $ret[$key] = [
+                    "name" => $property['name'],
+                    "status" => "failed",
+                    'value' => $property['location'] . " Location is not valid",
+                ];
                 continue;
             }
             if (array_key_exists($property['micromarket'], $staticArray['microMarket'])) {
                 $property['micromarket'] = $staticArray['microMarket'][$property['micromarket']];
             } else {
-                $ret[$key] = ["name" => $property['name'], "status" => "failed", 'value' => "Micromarket is not valid"];
+                $ret[$key] = [
+                    "name" => $property['name'],
+                    "status" => "failed",
+                    'value' => $property['micromarket'] . " Micromarket is not valid",
+                ];
                 continue;
             }
             $property['user_id'] = 1;
@@ -202,6 +239,9 @@ class PropertyMasterController extends Controller
             $tpath = base_path() . '/public/uploads/' . $property_id . "/";
             File::ensureDirectoryExists($tpath, 0777, true, true);
 
+            // echo "<pre>";
+            // print_r($value['details']);
+            // die();
             foreach ($value['details'] as $dKey => $dValue) {
                 if (($dKey == 'park_layout' || $dKey == 'building_layout' || $dKey == 'photographs') && !empty($dValue)) {
                     $fpath = base_path() . '/public/uploads/parin/' . $dValue;
