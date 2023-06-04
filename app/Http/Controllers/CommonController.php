@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Contactus;
 use App\Models\Locations;
 use App\Models\LocationMicroMarkets;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+
 use App\Models\OauthAccessToken;
 use Illuminate\Support\Facades\Hash;
 
@@ -65,5 +67,23 @@ class CommonController extends Controller
         } else {
             return $this->sendBadRequest("Email or Password in wrong");
         }
+    }
+
+    public function contactus(Request $request)
+    {
+        $input = $this->request->post();
+        $rules = Contactus::$rules;
+        $validator = Validator::make($input, $rules);
+
+        if ($validator->fails()) {
+            return $this->sendBadRequest($validator->errors());
+        }
+        $template = 'email.contact-us';
+        $to = 'pcgpvtltd88@gmail.com';
+        $sub = $input['subject'];
+        $emailData = ['name' => $input['name'], 'message' => $input['message'], 'data' => $input];
+        sendEmail($template, $to, "A new contact request by Customer", $emailData);
+        Contactus::create($input);
+        return $this->successResponse($input, "Thank you for the interest, we will reach out to you shorty.");
     }
 }
