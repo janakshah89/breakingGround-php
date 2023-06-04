@@ -288,7 +288,13 @@ class PropertyMasterController extends Controller
         return $ret;
     }
 
-    public function similar_property($cityId)
+    public function similar_property($mId)
     {
+        $properties = PropertyMaster::with('location', 'types', 'availability', 'microMarket')
+            ->where("microMarket", $mId)->get();
+        if (!$properties->count()) {
+            return $this->recordNotFound();
+        }
+        return $this->successResponse($properties, trans('auth.getRecords'));
     }
 }
