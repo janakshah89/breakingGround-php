@@ -33,7 +33,7 @@ Route::post("properties", "App\Http\Controllers\PropertyMasterController@create"
 Route::post("upload", "App\Http\Controllers\PropertyMasterController@upload");
 
 Route::get("/similarproperties/{id}", "App\Http\Controllers\PropertyMasterController@similar_property");
-Route::post("contactus", "App\Http\Controllers\CommonController@contactus");
+Route::middleware('throttle:10,1')->post("contactus", "App\Http\Controllers\CommonController@contactus");
 // Route::fallback(
 //     function () {
 //         return response()->json(

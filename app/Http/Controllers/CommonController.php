@@ -78,9 +78,10 @@ class CommonController extends Controller
         if ($validator->fails()) {
             return $this->sendBadRequest($validator->errors());
         }
+
         $template = 'email.contact-us';
-        $to = 'pcgpvtltd88@gmail.com';
-        $sub = $input['subject'];
+        $to = env('DEVELOPER_EMAIL');
+
         $emailData = ['name' => $input['name'], 'message' => $input['message'], 'data' => $input];
         sendEmail($template, $to, "A new contact request by Customer", $emailData);
         Contactus::create($input);

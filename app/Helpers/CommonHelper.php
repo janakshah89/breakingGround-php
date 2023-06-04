@@ -18,14 +18,14 @@ function sendEmail($template, $to, $sub, $data): string
     Log::info($data);
     try {
         if (App::Environment() !== 'production') {
-            // $to = env('DEVELOPER_EMAIL');
+             $to = env('DEVELOPER_EMAIL');
         }
         Mail::send(
             $template,
             $data,
             function ($message) use ($data, $to, $sub) {
                 $message->to($to, $data['name'])->subject($sub);
-                $message->from('admin@pivot-technology.com', $sub);
+                $message->from(env('MAIL_FROM_ADDRESS'), $sub);
             }
         );
         return true;
