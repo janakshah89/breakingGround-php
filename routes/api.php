@@ -33,21 +33,21 @@ Route::post("properties", "App\Http\Controllers\PropertyMasterController@create"
 Route::post("upload", "App\Http\Controllers\PropertyMasterController@upload");
 
 Route::get("/similarproperties/{id}", "App\Http\Controllers\PropertyMasterController@similar_property");
-
-Route::fallback(
-    function () {
-        return response()->json(
-            [
-                'file' => __FILE__,
-                'line' => __LINE__,
-                'code' => 404,
-                'message' => 'Not Found',
-                'trace' => null,
-                'response' => [],
-            ],
-            404,
-            [],
-            JSON_UNESCAPED_UNICODE
-        );
-    }
-)->name('Api.NotFound');
+Route::post("contactus", "App\Http\Controllers\CommonController@contactus");
+// Route::fallback(
+//     function () {
+//         return response()->json(
+//             [
+//                 'file' => __FILE__,
+//                 'line' => __LINE__,
+//                 'code' => 404,
+//                 'message' => 'Not Found',
+//                 'trace' => null,
+//                 'response' => [],
+//             ],
+//             404,
+//             [],
+//             JSON_UNESCAPED_UNICODE
+//         );
+//     }
+// )->name('Api.NotFound');
