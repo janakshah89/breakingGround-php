@@ -32,6 +32,7 @@ Route::get("/properties/{id}", "App\Http\Controllers\PropertyMasterController@sh
 Route::post("properties", "App\Http\Controllers\PropertyMasterController@create");
 Route::post("upload", "App\Http\Controllers\PropertyMasterController@upload");
 
+Route::get("/similarproperties/{id}", "App\Http\Controllers\PropertyMasterController@similar_property");
 
 Route::fallback(
     function () {
