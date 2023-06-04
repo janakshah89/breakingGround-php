@@ -179,7 +179,7 @@ class PropertyMasterController extends Controller
             // echo "<pre>";
             // print_r($property);
             // die();
-            $property['buyorlease'] = ($property['buyorlease'] == "Lease") ? 1 : 0;
+            $property['buyorlease'] = ($property['buyorlease'] == "Lease") ? 0 : 1;
 
             $property['availability'] = strtolower($property['availability']);
             $property['location'] = strtolower($property['location']);
@@ -286,5 +286,9 @@ class PropertyMasterController extends Controller
             $ret[$key] = ["name" => $key, "status" => "success", 'value' => $property_id];
         }
         return $ret;
+    }
+
+    public function similar_property($cityId)
+    {
     }
 }
