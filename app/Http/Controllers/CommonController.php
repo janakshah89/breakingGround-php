@@ -101,7 +101,7 @@ class CommonController extends Controller
         $property = new PropertyRequest();
         $attachedFiles = [];
         if ($request->hasFile('file')) {
-            $property->file = $request->file('file')->getClientOriginalName();
+            $property->file = time() . $request->file('file')->getClientOriginalName();
             $request->file('file')->move(base_path() . '/public/uploads/PropertyRequest', $property->file);
             $attachedFiles[] = base_path() . '/public/uploads/PropertyRequest/' . $property->file;
         }
