@@ -109,7 +109,7 @@ class CommonController extends Controller
         $property->company = $request['company'];
         $property->phone = $request['phone'];
         $property->email = $request['email'];
-
+        $property->save();
         $template = 'email.property-request';
         $to = env('DEVELOPER_EMAIL');
         $emailData = ['name' => $input['name'], 'data' => $input];
