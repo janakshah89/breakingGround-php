@@ -113,7 +113,7 @@ class CommonController extends Controller
         $template = 'email.property-request';
         $to = env('DEVELOPER_EMAIL');
         $emailData = ['name' => $input['name'], 'data' => $input];
-        $tt = sendEmail($template, $to, "A new Property request received", $emailData, $attachedFiles);
-        return $this->successResponse($tt, "Thank you for the interest, we will reach out to you shorty.");
+        sendEmail($template, $to, "A new Property request received", $emailData, $attachedFiles);
+        return $this->successResponse($property, "Thank you for the interest, we will reach out to you shorty.");
     }
 }
