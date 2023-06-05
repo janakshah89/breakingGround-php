@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contactus;
 use App\Models\Locations;
 use App\Models\LocationMicroMarkets;
+use App\Models\PropertyRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -57,7 +58,7 @@ class CommonController extends Controller
         $rememberMe = false;
         if (Auth::attempt($input, $rememberMe)) {
             $this->currentUser = Auth::user();
-            // check account is active or deactivate
+            // check account is active
             if ($this->currentUser['is_active'] != 1) {
                 Session::flush();
                 return $this->sendAccessDenied("Sorry the User is not active");
@@ -78,12 +79,41 @@ class CommonController extends Controller
         if ($validator->fails()) {
             return $this->sendBadRequest($validator->errors());
         }
+
         $template = 'email.contact-us';
-        $to = 'pcgpvtltd88@gmail.com';
-        $sub = $input['subject'];
+        $to = env('DEVELOPER_EMAIL');
+
         $emailData = ['name' => $input['name'], 'message' => $input['message'], 'data' => $input];
         sendEmail($template, $to, "A new contact request by Customer", $emailData);
         Contactus::create($input);
         return $this->successResponse($input, "Thank you for the interest, we will reach out to you shorty.");
+    }
+
+    public function property_request(Request $request)
+    {
+        $input = $request->all();;
+        $rules = PropertyRequest::$rules;
+
+        $validator = Validator::make($input, $rules);
+        if ($validator->fails()) {
+            return $this->sendBadRequest($validator->errors());
+        }
+        $property = new PropertyRequest();
+        $attachedFiles = [];
+        if ($request->hasFile('file')) {
+            $property->file = $request->file('file')->getClientOriginalName();
+            $request->file('file')->move(base_path() . '/public/uploads/PropertyRequest', $property->file);
+            $attachedFiles[] = base_path() . '/public/uploads/PropertyRequest/' . $property->file;
+        }
+        $property->name = $request['name'];
+        $property->company = $request['company'];
+        $property->phone = $request['phone'];
+        $property->email = $request['email'];
+
+        $template = 'email.property-request';
+        $to = env('DEVELOPER_EMAIL');
+        $emailData = ['name' => $input['name'], 'data' => $input];
+        $tt = sendEmail($template, $to, "A new Property request received", $emailData, $attachedFiles);
+        return $this->successResponse($tt, "Thank you for the interest, we will reach out to you shorty.");
     }
 }

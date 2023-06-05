@@ -10,22 +10,23 @@ function getUploadPath(): string
 }
 
 
-function sendEmail($template, $to, $sub, $data): string
+function sendEmail($template, $to, $sub, $data, $attachment = null): string
 {
-    Log::info($template);
-    Log::info($to);
-    Log::info($sub);
-    Log::info($data);
     try {
         if (App::Environment() !== 'production') {
-            // $to = env('DEVELOPER_EMAIL');
+            $to = env('DEVELOPER_EMAIL');
         }
         Mail::send(
             $template,
             $data,
-            function ($message) use ($data, $to, $sub) {
+            function ($message) use ($data, $to, $sub, $attachment) {
                 $message->to($to, $data['name'])->subject($sub);
-                $message->from('admin@pivot-technology.com', $sub);
+                $message->from(env('MAIL_FROM_ADDRESS'), $sub);
+                if ($attachment) {
+                    foreach ($attachment as $file) {
+                        $message->attach($file);
+                    }
+                }
             }
         );
         return true;
