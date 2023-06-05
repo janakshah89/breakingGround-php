@@ -18,6 +18,6 @@ class PropertyRequest extends Model
             "company" => "required|max:200",
             "email" => "required|email|max:200",
             "phone" => "required|max:20",
-            "file" => "mimes:jpeg,jpg,png,pdf,xlx,xlsx,csv,bmp,svg,webp,gif,pjpeg,txt",
+            "file" => "required|mimes:jpeg,jpg,png,pdf,xlx,xlsx,csv,bmp,svg,webp,gif,pjpeg,txt",
         ];
 }
