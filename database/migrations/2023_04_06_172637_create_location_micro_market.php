@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('location_micro_markets', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("location_id");
+            $table->string('uuid');
             $table->string("name");
             $table->text("description")->nullable();
             $table->string("image")->nullable();

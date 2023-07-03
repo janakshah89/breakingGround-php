@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('property_masters', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid');
             $table->string('name')->index();
             $table->unsignedBigInteger('user_id')->index();
             $table->boolean('buyorlease')->default('0')->comment("1=Buy");

@@ -3,12 +3,17 @@
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 function getUploadPath(): string
 {
     return base_path() . "/uploads/";
 }
 
+function getUuid()
+{
+    return Str::uuid()->toString() . "-" . time();
+}
 
 function sendEmail($template, $to, $sub, $data, $attachment = null): string
 {

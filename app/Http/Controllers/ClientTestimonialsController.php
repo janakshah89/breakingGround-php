@@ -10,15 +10,15 @@ use Illuminate\Http\Request;
 
 class ClientTestimonialsController extends Controller
 {
-    public function listItems(Request $request): JsonResponse
+    public function listItems(Request $request)
     {
-        try{
-            $records =  ClientTestimonials::get();
-            foreach ($records as $value){
+        try {
+            $records = ClientTestimonials::get();
+            foreach ($records as $value) {
                 $value->file = config('constant.uploadPath') . $value->file;
             }
-            return $this->successResponse($records,trans('auth.getRecords'));
-        }catch(ModelNotFoundException $e){
+            return $this->successResponse($records, trans('auth.getRecords'));
+        } catch (ModelNotFoundException $e) {
             return $this->sendBadRequest($e->getMessage());
         }
     }

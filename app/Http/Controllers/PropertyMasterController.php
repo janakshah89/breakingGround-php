@@ -44,7 +44,7 @@ class PropertyMasterController extends Controller
         if (!empty($params['sizeMax']) && !empty($params['sizeMin'])) {
             $properties = $properties->whereBetween("sqft", [$params['sizeMin'], $params['sizeMax']]);
         }
-        $properties = $properties->where('is_active', 1);
+        $properties = $properties->where('is_active', 1)->orderBy('id', 'desc');
 
         if (!$properties->count()) {
             return $this->recordNotFound();
@@ -56,6 +56,7 @@ class PropertyMasterController extends Controller
 
     public function create()
     {
+        return $this->sendBadRequest("Temporary closed");
         $faker = Factory::create();
         $originalPrice = $faker->randomFloat('2', 1200, 30000);
         $discountMin = $originalPrice / 2;
@@ -63,6 +64,7 @@ class PropertyMasterController extends Controller
 
         $dataArray = new PropertyMaster();
         $dataArray->name = $faker->name();
+        $dataArray->uuid = getUuid();
         $dataArray->user_id = 1;
         $dataArray->buyorlease = $faker->randomElement([0, 1]);
         $dataArray->type = $faker->randomElement([1, 2, 3]);
@@ -227,6 +229,7 @@ class PropertyMasterController extends Controller
                 continue;
             }
             $property['user_id'] = 1;
+            $property['uuid'] = getUuid();
             if (empty($record->id)) {
                 $create = PropertyMaster::create($property);
                 $property_id = $create->id;
@@ -235,7 +238,6 @@ class PropertyMasterController extends Controller
                 $record->update($property);
             }
             Log::info("Master Id: " . $property_id);
-
             $tpath = base_path() . '/public/uploads/' . $property_id . "/";
             File::ensureDirectoryExists($tpath, 0777, true, true);
 
@@ -259,7 +261,7 @@ class PropertyMasterController extends Controller
             }
 
             foreach ($value['files'] as $fValue) {
-                Log::info($fValue);
+                // Log::info($fValue);
                 if ($fValue['file_type'] == 'image' || $fValue['file_type'] == 'pdf') {
                     $fpath = base_path() . '/public/uploads/parin/' . $fValue['file'];
                     if (file_exists($fpath)) {
